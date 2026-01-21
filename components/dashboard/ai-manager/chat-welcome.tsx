@@ -5,8 +5,6 @@ import {
   MessageSquare,
   Database,
   Headphones,
-  MessageCircle,
-  Server,
   Bot,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -18,24 +16,24 @@ interface ChatWelcomeProps {
 
 const suggestions = [
   {
+    icon: MessageSquare,
+    title: "What can you do?",
+    description: "Discover available features and capabilities",
+  },
+  {
     icon: Headphones,
-    title: "Freshdesk",
-    description: "Search tickets, agents, and customer support data",
-  },
-  {
-    icon: MessageCircle,
-    title: "Freshchat",
-    description: "Query conversations, messages, and chat analytics",
-  },
-  {
-    icon: Server,
-    title: "Maqsam",
-    description: "Search call logs, recordings, and telephony data",
+    title: "Get Help",
+    description: "Ask questions and get instant support",
   },
   {
     icon: Database,
-    title: "Supabase",
-    description: "Query database tables, users, and application data",
+    title: "Show Examples",
+    description: "See sample use cases and demonstrations",
+  },
+  {
+    icon: Bot,
+    title: "Getting Started",
+    description: "Learn how to use this application effectively",
   },
 ];
 

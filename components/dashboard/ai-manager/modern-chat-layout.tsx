@@ -105,9 +105,9 @@ export function ModernChatLayout() {
   const showWelcome = messages.length === 0 && !isLoading;
 
   return (
-    <div className="flex h-[100dvh] md:h-[calc(100vh-120px)] flex-col bg-background relative">
+    <div className="flex h-[calc(100vh-110px)] md:h-[calc(100vh-120px)] flex-col bg-background relative">
       {/* Header with History Button */}
-      <div className="absolute top-2 right-2 md:top-0 md:right-4 z-20 flex items-center gap-2">
+      <div className="absolute top-[-8px] md:top-0 md:right-4 z-20 flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"
@@ -129,7 +129,7 @@ export function ModernChatLayout() {
       />
 
       {/* Messages Area - Scrollable */}
-      <div className="flex-1 overflow-hidden pt-12 md:pt-4">
+      <div className="flex-1 overflow-hidden  md:pt-4">
         {messageLoading || isCreatingNewConversation ? (
           <div className="flex h-full justify-center items-center">
             <Loader2 className="h-8 w-8 md:h-10 md:w-10 animate-spin" />
@@ -160,7 +160,7 @@ export function ModernChatLayout() {
       )}
 
       {/* Input Area - Fixed at Bottom */}
-      <div className="shrink-0">
+      <div className="shrink-0 relative top-[14px] md:top-0">
         <ClaudeChatInput
           value={input}
           onChange={(value) => {

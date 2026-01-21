@@ -109,7 +109,7 @@ export function ClaudeChatInput({
           <div className="flex flex-col px-2.5 md:px-3 pt-2 md:pt-3 pb-1.5 md:pb-2 gap-1.5 md:gap-2">
             {/* Input Area */}
             <div className="relative mb-0.5 md:mb-1">
-              <div className="max-h-32 md:max-h-60 w-full overflow-y-auto min-h-[2rem] md:min-h-10 pl-0.5 md:pl-1">
+              <div className="max-h-32 md:max-h-60 w-full overflow-y-auto min-h-8 md:min-h-10 pl-0.5 md:pl-1">
                 <Textarea
                   ref={textareaRef}
                   value={value}
