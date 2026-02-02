@@ -493,7 +493,7 @@ export function ConversationProvider({
                   previousResponseId: previousResponseIdForMessage ?? null,
                 }
               );
-            finalConversationId = createData;
+            finalConversationId = createData ?? null;
 
             setCurrentConversationId(finalConversationId);
             conversationIdRef.current = finalConversationId; // Update ref immediately

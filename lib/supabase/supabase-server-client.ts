@@ -1,6 +1,6 @@
 "use server";
 
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
@@ -18,8 +18,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export async function createClient(cookieStore: ReadonlyRequestCookies) {
   return createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
+    supabaseUrl || "",
+    supabaseAnonKey || "",
     {
       cookies: {
         getAll() {
