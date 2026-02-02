@@ -1,4 +1,3 @@
-import { supabaseAdmin } from "@/lib/supabase/supabase-auth-client";
 import { executeGraphQLBackend } from "@/lib/graphql-server";
 import {
   INSERT_AI_MESSAGE,
@@ -44,22 +43,8 @@ export const aiMessagesService = {
         "Error inserting ai_messages via GraphQL, falling back to Supabase:",
         error
       );
-
-      const { error: supabaseError } = await supabaseAdmin
-        .from("ai_messages")
-        .insert({
-          conversation_id: conversationId,
-          user_id: userId ?? null,
-          role,
-          content,
-          provider_response_id: providerResponseId ?? null,
-          metadata: metadata ?? null,
-        });
-
-      if (supabaseError) {
-        console.error("Error inserting ai_messages:", supabaseError);
-        throw supabaseError;
-      }
+    
+     
     }
   },
 
@@ -106,20 +91,7 @@ export const aiMessagesService = {
         error
       );
 
-      const { data, error: supabaseError } = await supabaseAdmin
-        .from("ai_messages")
-        .select(
-          "id, role, content, created_at, provider_response_id, metadata"
-        )
-        .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true });
 
-      if (supabaseError) {
-        console.error("Error fetching conversation messages:", supabaseError);
-        throw supabaseError;
-      }
-
-      return data || [];
     }
   },
 };

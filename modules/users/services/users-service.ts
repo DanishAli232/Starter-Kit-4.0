@@ -1,4 +1,3 @@
-import { supabaseAdmin } from "@/lib/supabase/supabase-auth-client";
 import {
   DELETE_USER,
   GET_USERS,
@@ -10,6 +9,7 @@ import {
   UPDATE_USER,
 } from "./users-graphql";
 import { executeGraphQLBackend } from "@/lib/graphql-server";
+import { createAdminServerClient } from "@/lib/supabase/supabase-helpers";
 import { User } from "@/types/types";
 
 export const usersService = {
@@ -130,6 +130,7 @@ export const usersService = {
     try {
       // Delete user from GraphQL database
       await executeGraphQLBackend(DELETE_USER, { id });
+      const supabaseAdmin = await createAdminServerClient();
 
       const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
       if (error) {

@@ -1,11 +1,12 @@
+import { createAdminServerClient } from "@/lib/supabase/supabase-helpers";
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase/supabase-auth-client";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const operation = searchParams.get("operation");
     const roleId = searchParams.get("roleId");
+    const supabaseAdmin = await createAdminServerClient()
 
     switch (operation) {
       case "getByRole": {
@@ -46,6 +47,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const { operation, data } = await req.json();
+    const supabaseAdmin = await createAdminServerClient()
 
     switch (operation) {
       case "create": {
@@ -92,6 +94,7 @@ export async function DELETE(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const roleId = searchParams.get("roleId");
+    const supabaseAdmin = await createAdminServerClient()
 
     if (roleId) {
       // Delete all permissions for a role

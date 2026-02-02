@@ -1,18 +1,13 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { Session, WeakPassword } from "@supabase/supabase-js";
-import { AuthSignupData } from "@/modules/auth";
+import { Session } from "@supabase/supabase-js";
 import {
-  signIn as signInAction,
   signOut as signOutAction,
-  signUp as signUpAction,
-  type AuthServiceError,
 } from "@/modules/auth/services/auth-service";
 
 import { usersService } from "@/modules/users";
 import { User, UserRoles } from "@/types/types";
 import { Settings, settingsService } from "@/modules/settings";
-import { supabase } from "@/lib/supabase/supabase-auth-client";
 import { LogOut, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { checkAuthentication } from "@/utils/check-authentication";
@@ -24,10 +19,7 @@ type AuthContextType = {
   session: Session | null;
   loading: boolean;
   settings: Settings | null;
-  signIn: (
-    email: string,
-    password: string
-  ) => Promise<{ user: User; session: Session; weakPassword?: WeakPassword }>;
+  
   signOut: () => Promise<void>;
   setUser: (user: User | null) => void;
   setUserProfile: (userProfile: User | null) => void;
@@ -157,48 +149,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
- 
-  const signIn = async (email: string, password: string) => {
-    // Call server action for sign in
-    const result = await signInAction(email, password);
-
-    if (
-      result &&
-      typeof result === "object" &&
-      "type" in result &&
-      result.type === "error"
-    ) {
-      const error = new Error((result as AuthServiceError).message);
-      throw error;
-    }
-
-    // Type assertion for the success case
-    const signInData = result as {
-      user: User;
-      session: Session;
-      weakPassword?: WeakPassword;
-    };
-
-    // Refresh user data after successful sign in
-    await fetchUserData();
-
-    return signInData;
-  };
-
   const signOut = async () => {
     try {
       setLoading(true);
-      // Sign out on client side
-      const client = supabase();
-      await client.auth.signOut();
-
-      // Also call server action to clear server-side session
-      try {
-        await signOutAction();
-      } catch (serverError) {
-        console.error("Server sign out error:", serverError);
-      }
-
+      await signOutAction();  // ✅ That's it!
       setUser(null);
       setUserProfile(null);
       setSession(null);
@@ -207,7 +161,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       setLoading(false);
       console.error("Sign out error:", error);
-      throw error;
+      setUser(null);
+      setUserProfile(null);
+      setSession(null);
+      setSettings(null);
+      window.location.href = "/auth/login";
     }
   };
 
@@ -253,7 +211,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     loading,
     settings,
     setUserProfile,
-    signIn,
     signOut,
     setUser,
     setSettings,

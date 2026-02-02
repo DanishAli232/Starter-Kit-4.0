@@ -22,7 +22,7 @@ import { Role } from "@/types/types";
 import EditUser from "@/components/dashboard/user/component/edit-user";
 import ChangePassword from "@/components/dashboard/user/component/change-password";
 import { usersService } from "@/modules/users/services/users-service";
-import { deleteAuthUser } from "@/lib/actions/auth-actions";
+import { deleteAuthUser } from "@/modules/auth/auth-actions";
 import { toast } from "sonner";
 import { ConfirmationAlertDialog } from "@/components/ui/confirmation-alert-dialog";
 import { useAuth } from "@/context/AuthContext";

@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { updateUserPassword } from "@/lib/actions/auth-actions";
+import { updateUserPassword } from "@/modules/auth/auth-actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/actions/utils";
 import { zodResolver } from "@hookform/resolvers/zod";

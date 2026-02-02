@@ -1,9 +1,9 @@
 "use server";
 
 import { UserRoles } from "@/types/types";
-import { emailService } from "../email-service";
-import { supabase, supabaseAdmin } from "../supabase/supabase-auth-client";
+import { emailService } from "../../lib/email-service";
 import crypto from "crypto";
+import { createAdminServerClient, createServerClientWithCookies } from "../../lib/supabase/supabase-helpers";
 
 /**
  * Delete a user from Supabase auth
@@ -11,8 +11,9 @@ import crypto from "crypto";
  */
 export async function deleteAuthUser(userId: string, type: string) {
   try {
-    let error: any = null;
-    let data: any = null;
+    const supabaseAdmin = await createAdminServerClient()
+    let error: Error | null = null;
+    let data: unknown | null = null;
     // First check if user exists in auth
     if (type === "user") {
       const { data: user, error: checkError } =
@@ -57,8 +58,9 @@ export async function createAuthUser(
   type: string
 ) {
   try {
-    let error: any = null;
-    let data: any = null;
+    const supabaseAdmin = await createAdminServerClient()
+    let error: Error | null = null;
+    let data: unknown | null = null;
     if (type === UserRoles.USER) {
       const { data: userData, error: userError } =
         await supabaseAdmin.auth.admin.createUser({
@@ -74,8 +76,8 @@ export async function createAuthUser(
       console.error("Error creating auth user:", error);
       return { success: false, error: error.message, user: null };
     }
-
-    return { success: true, user: data.user };
+// @ts-expect-error - data is of type User
+    return { success: true, user: data?.user  };
   } catch (error) {
     console.error("Unexpected error creating auth user:", error);
     return {
@@ -96,8 +98,9 @@ export async function requestPasswordReset(email: string, type: string) {
   try {
     // 1. Find user by email
     let userId: string | null = null;
+    const supabase  = await createServerClientWithCookies()
     if (type === "user") {
-      const { data, error } = await supabase()
+      const { data, error } = await supabase
         .from("user_profile")
         .select("id")
         .eq("email", email)
@@ -113,7 +116,7 @@ export async function requestPasswordReset(email: string, type: string) {
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
 
     // 3. Store token in password_resets table
-    const { error: insertError } = await supabase()
+    const { error: insertError } = await supabase
       .from("password_resets")
       .insert({
         user_id: userId,
@@ -131,6 +134,8 @@ export async function requestPasswordReset(email: string, type: string) {
       subject: "Reset your password",
       html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p><p>If you did not request this, ignore this email.</p>`,
     });
+    if (res.error) throw new Error(res.error.message);
+    return { success: true };
   } catch (error) {
     console.log("🚀 ~ requestPasswordReset ~ error:", error);
     throw new Error("Something went wrong, so please try again later.");
@@ -147,7 +152,8 @@ export async function resetPassword(
 ) {
   try {
     // 1. Find token in password_resets table
-    const { data, error } = await supabase()
+    const supabase = await createServerClientWithCookies()
+    const { data, error } = await supabase
       .from("password_resets")
       .select("id, user_id, expires_at, used_at")
       .eq("token", token)
@@ -160,14 +166,14 @@ export async function resetPassword(
 
     // 2. Update password using Supabase() admin
     if (type !== "user") throw new Error("Only user type supported");
-    const { error: updateError } = await supabase().auth.admin.updateUserById(
+    const { error: updateError } = await supabase.auth.admin.updateUserById(
       data.user_id,
       { password: newPassword }
     );
     if (updateError) throw new Error(updateError.message);
 
     // 3. Mark token as used
-    await supabase()
+    await supabase
       .from("password_resets")
       .update({ used_at: new Date().toISOString() })
       .eq("id", data.id);
@@ -182,7 +188,8 @@ export async function resetPassword(
  */
 export async function updateUserPassword(userId: string, newPassword: string) {
   try {
-    const { data, error } = await supabase().auth.admin.updateUserById(userId, {
+    const supabaseAdmin = await createAdminServerClient()
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
       password: newPassword,
     });
 

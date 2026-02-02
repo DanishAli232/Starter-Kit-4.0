@@ -11,12 +11,12 @@ export async function POST(req: NextRequest) {
 
     // Execute the GraphQL query using Supabase's REST API
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/graphql/v1`,
+      `${process.env.SUPABASE_URL}/graphql/v1`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          apikey: process.env.SUPABASE_ANON_KEY!,
         },
         body: JSON.stringify({ query, variables }),
       }

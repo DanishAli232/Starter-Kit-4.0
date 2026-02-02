@@ -111,7 +111,7 @@ const Login2 = () => {
                 <Separator className="flex-1" />
               </div>
 
-              <Button disabled={isSocialLoading === "google"} variant="ghost" className="w-full"               onClick={() => handleSocialLogin("google")}
+              <Button disabled={isSocialLoading === "google"} variant="ghost" className="w-full cursor-pointer"               onClick={() => handleSocialLogin("google")}
               >
                 {isSocialLoading === "google" ? (
                   <Loader2   className="w-4 h-4 animate-spin" />

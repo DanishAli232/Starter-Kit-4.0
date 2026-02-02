@@ -1,4 +1,3 @@
-import { supabaseAdmin } from "@/lib/supabase/supabase-auth-client";
 import { executeGraphQLBackend } from "@/lib/graphql-server";
 import {
   CREATE_AI_CONVERSATION,
@@ -66,26 +65,7 @@ export const aiConversationsService = {
         error
       );
 
-      const { data, error: supabaseError } = await supabaseAdmin
-        .from("ai_conversations")
-        .insert({
-          user_id: userId,
-          user_role: userRole,
-          title: title ?? null,
-          description: description ?? null,
-          last_message_at: new Date().toISOString(),
-          metadata: metadata ?? null,
-          previous_response_id: previousResponseId ?? null,
-        })
-        .select("id")
-        .single();
-
-      if (supabaseError) {
-        console.error("Error creating ai_conversations:", supabaseError);
-        throw supabaseError;
-      }
-
-      return data!.id as string;
+    
     }
   },
 
@@ -122,21 +102,7 @@ export const aiConversationsService = {
         error
       );
 
-      const { data, error: supabaseError } = await supabaseAdmin
-        .from("ai_conversations")
-        .select(
-          "id, title, description, last_message_at, created_at, previous_response_id"
-        )
-        .eq("user_id", userId)
-        .order("last_message_at", { ascending: false })
-        .limit(50);
-
-      if (supabaseError) {
-        console.error("Error fetching user conversations:", supabaseError);
-        throw supabaseError;
-      }
-
-      return data || [];
+    
     }
   },
 
@@ -160,18 +126,7 @@ export const aiConversationsService = {
         error
       );
 
-      const { data, error: supabaseError } = await supabaseAdmin
-        .from("ai_conversations")
-        .select("*")
-        .eq("id", id)
-        .maybeSingle();
-
-      if (supabaseError) {
-        console.error("Error fetching conversation:", supabaseError);
-        throw supabaseError;
-      }
-
-      return data;
+     
     }
   },
 
@@ -216,10 +171,12 @@ export const aiConversationsService = {
         updateData.description = description;
       }
 
-      const { error: supabaseError } = await supabaseAdmin
-        .from("ai_conversations")
-        .update(updateData)
-        .eq("id", id);
+      const { error: supabaseError } = await executeGraphQLBackend(UPDATE_AI_CONVERSATION, {
+        id,
+        title: title ?? null,
+        description: description ?? null,
+        previous_response_id: previousResponseId ?? null,
+      });
 
       if (supabaseError) {
         console.error("Error updating ai_conversations:", supabaseError);

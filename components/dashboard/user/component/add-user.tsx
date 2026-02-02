@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createAuthUser } from "@/lib/actions/auth-actions";
+import { createAuthUser } from "@/modules/auth/auth-actions";
 import { toast } from "sonner";
 import {
   Dialog,

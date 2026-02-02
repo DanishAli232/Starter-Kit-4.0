@@ -1,4 +1,3 @@
-import { executeGraphQL } from "@/lib/graphql-client";
 import {
   GET_ALL_ROLES,
   GET_ROLE_BY_ID,
@@ -48,7 +47,7 @@ export const rolesService = {
    */
   getRoleById: async (id: string): Promise<Role | null> => {
     try {
-      const data = await executeGraphQL<{ roles_by_pk: Role }>(GET_ROLE_BY_ID, {
+      const data = await executeGraphQLBackend<{ roles_by_pk: Role }>(GET_ROLE_BY_ID, {
         id,
       });
       return data.roles_by_pk;
@@ -102,7 +101,7 @@ export const rolesService = {
       const offset = page * pageSize;
       const searchPattern = `%${search}%`;
 
-      const data = await executeGraphQL(GET_ROLES_PAGINATED, {
+      const data = await executeGraphQLBackend(GET_ROLES_PAGINATED, {
         limit: pageSize,
         offset: offset,
       });
@@ -127,7 +126,7 @@ export const rolesService = {
       // Add wildcard for partial matches
       const formattedSearchTerm = `%${searchTerm}%`;
 
-      const data = await executeGraphQL(SEARCH_ROLES, {
+      const data = await executeGraphQLBackend(SEARCH_ROLES, {
         searchTerm: formattedSearchTerm,
       });
 
@@ -164,7 +163,7 @@ export const rolesService = {
     description?: string
   ): Promise<Role | null> => {
     try {
-      const data = await executeGraphQL(CREATE_ROLE, {
+      const data = await executeGraphQLBackend(CREATE_ROLE, {
         objects: [
           {
             id: uuidv4(),
@@ -190,7 +189,7 @@ export const rolesService = {
     description?: string
   ): Promise<Role | null> => {
     try {
-      const data = await executeGraphQL(UPDATE_ROLE, {
+      const data = await executeGraphQLBackend(UPDATE_ROLE, {
         id,
         name,
         description,
@@ -208,7 +207,7 @@ export const rolesService = {
    */
   deleteRole: async (id: string): Promise<boolean> => {
     try {
-      const result = await executeGraphQL(DELETE_ROLE, { id });
+      const result = await executeGraphQLBackend(DELETE_ROLE, { id });
       return result.deleteFromrolesCollection.affectedCount > 0;
     } catch (error) {
       console.error(`Error deleting role with ID ${id}:`, error);
@@ -221,7 +220,7 @@ export const rolesService = {
    */
   getRoleAccess: async (roleId: string): Promise<RoleAccess[]> => {
     try {
-      const data = await executeGraphQL(GET_ROLE_ACCESS, {
+      const data = await executeGraphQLBackend(GET_ROLE_ACCESS, {
         filter: { ...(roleId ? { role_id: { eq: roleId } } : {}) },
       });
       return data.role_accessCollection.edges.map(
@@ -242,7 +241,7 @@ export const rolesService = {
     action: string
   ): Promise<RoleAccess | null> => {
     try {
-      const data = await executeGraphQL(CREATE_ROLE_ACCESS, {
+      const data = await executeGraphQLBackend(CREATE_ROLE_ACCESS, {
         objects: [
           {
             role_id: roleId,
@@ -270,7 +269,7 @@ export const rolesService = {
    */
   deleteRoleAccess: async (id: string): Promise<boolean> => {
     try {
-      const result = await executeGraphQL(DELETE_ROLE_ACCESS, { id });
+      const result = await executeGraphQLBackend(DELETE_ROLE_ACCESS, { id });
       return result.deleteFromrole_accessCollection.affectedCount > 0;
     } catch (error) {
       console.error(`Error deleting role access with ID ${id}:`, error);
@@ -283,7 +282,7 @@ export const rolesService = {
    */
   deleteRoleAccessByRole: async (roleId: string): Promise<boolean> => {
     try {
-      const result = await executeGraphQL(DELETE_ROLE_ACCESS_BY_ROLE, {
+      const result = await executeGraphQLBackend(DELETE_ROLE_ACCESS_BY_ROLE, {
         roleId,
       });
       return result.deleteFromrole_accessCollection.affectedCount > 0;
