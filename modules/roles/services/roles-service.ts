@@ -166,12 +166,14 @@ export const rolesService = {
       const data = await executeGraphQLBackend(CREATE_ROLE, {
         objects: [
           {
-            id: uuidv4(),
             name,
             description: description || null,
           },
         ],
       });
+      if (data.insertIntorolesCollection.errors) {
+        throw new Error(data.insertIntorolesCollection.errors[0].message);
+      }
 
       return data.insertIntorolesCollection.records[0];
     } catch (error) {

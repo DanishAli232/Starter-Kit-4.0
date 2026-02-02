@@ -83,7 +83,10 @@ export function RoleDataTableToolbar({
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setIsSubmitting(true);
-      await rolesService.createRole(data.name, data.description);
+      const result = await rolesService.createRole(data.name, data.description);
+      if (!result) {
+        throw new Error("Failed to create role");
+      }
       toast.success("Role created successfully");
       setIsDialogOpen(false);
       form.reset();

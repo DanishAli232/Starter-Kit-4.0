@@ -12,8 +12,6 @@ COMMENT ON SCHEMA public IS
 
 
 
--- Step 1: Create User Roles ENUM Type
-CREATE TYPE public.user_roles AS ENUM ('admin', 'user');
 
 -- Step 2: Create Settings Table
 CREATE TABLE public.settings (
@@ -33,7 +31,7 @@ CREATE TABLE public.settings (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   logo_setting TEXT,
   logo_horizontal_url TEXT,
-  type public.user_roles
+  type TEXT
 );
 
 -- Step 3: Create Roles Table
@@ -42,7 +40,7 @@ CREATE TABLE public.roles (
   description TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  name public.user_roles NOT NULL UNIQUE
+  name TEXT NOT NULL UNIQUE
 );
 
 -- Step 4: Create User Profile Table
@@ -214,3 +212,58 @@ BEGIN
   RAISE NOTICE 'Migration 20250501_create_base_schema.sql completed successfully!';
 END $$;
 
+
+
+create table public."AI_Conversations" (
+  id uuid not null default gen_random_uuid (),
+  created_at timestamp with time zone not null default now(),
+  updated_at timestamp with time zone not null default now(),
+  user_id uuid not null,
+  user_role text not null,
+  title text null,
+  description text null,
+  last_message_at timestamp with time zone null,
+  metadata jsonb null,
+  previous_response_id text null,
+  constraint AI_Conversations_pkey primary key (id),
+  constraint AI_Conversations_user_id_fkey foreign KEY (user_id) references user_profile (id) on delete CASCADE
+) TABLESPACE pg_default;
+
+create index IF not exists idx_ai_conversations_user_id_created_at on public."AI_Conversations" using btree (user_id, created_at) TABLESPACE pg_default;
+
+create table public."AI_Messages" (
+  id uuid not null default gen_random_uuid (),
+  created_at timestamp with time zone not null default now(),
+  conversation_id uuid not null,
+  user_id uuid null,
+  role text not null,
+  content text not null,
+  provider_response_id text null,
+  metadata jsonb null,
+  constraint AI_Messages_pkey primary key (id),
+  constraint AI_Messages_conversation_id_fkey foreign KEY (conversation_id) references "AI_Conversations" (id) on delete CASCADE,
+  constraint AI_Messages_user_id_fkey foreign KEY (user_id) references user_profile (id) on delete set null,
+  constraint AI_Messages_role_check check (
+    (
+      role = any (
+        array['user'::text, 'assistant'::text, 'system'::text]
+      )
+    )
+  )
+) TABLESPACE pg_default;
+
+create index IF not exists idx_ai_messages_conversation_id_created_at on public."AI_Messages" using btree (conversation_id, created_at) TABLESPACE pg_default;
+
+create table public.role_access (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  role_id uuid not null,
+  resource text not null,
+  action text not null,
+  created_at timestamp with time zone not null default now(),
+  updated_at timestamp with time zone not null default now(),
+  enabled boolean null default true,
+  record_access text null default 'All Records'::text,
+  constraint role_access_pkey primary key (id),
+  constraint role_access_role_id_resource_action_key unique (role_id, resource, action),
+  constraint role_access_role_id_fkey foreign KEY (role_id) references roles (id) on delete CASCADE
+) TABLESPACE pg_default;
