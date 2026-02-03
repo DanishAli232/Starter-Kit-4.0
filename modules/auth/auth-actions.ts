@@ -210,3 +210,24 @@ export async function updateUserPassword(userId: string, newPassword: string) {
     };
   }
 }
+
+
+export async function deleteAuthUserById(id: string) {
+  try {
+    const supabaseAdmin = await createAdminServerClient();
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error deleting auth user:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unknown error deleting auth user",
+    };
+  }
+}
